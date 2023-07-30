@@ -26,17 +26,7 @@
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Sex">@context.Sex</MudTd>
-        <MudTd DataLabel="Email">
-            @context.Email
-            @* <MudButton OnClick="@(() => UpdateWorker(context.Id))">
-
-            <MudImage
-            Src="
-            https://ts1.cn.mm.bing.net/th?id=OIP-C.AtfZx4HT3t2igtiBG1MhxQHaE8&w=176&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
-            Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
-            </MudButton> *@
-
-        </MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
         <MudTd>
             <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Size="Size.Small"
                 Color="Color.Info" OnClick="@((e) => UpdateWorker(context.Id))">修改</MudButton>

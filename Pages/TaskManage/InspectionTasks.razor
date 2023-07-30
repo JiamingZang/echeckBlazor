@@ -33,12 +33,9 @@
         <MudTd DataLabel="DeviceList">
             @foreach (var record in ldb.InspectionTaskRecords.Find(x => x.TaskId == context.Id).ToList())
             {
-
                 <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary"
                     OnClick="@((e) => ShowTaskRecordInfo(record.Id))">
-                    @* <MudChip Color="Color.Primary"> *@
                     @(ldb.Equipments.Find(x => x.Id == record.EquipmentId).First().Name)->@record.Status.ToString()
-                    @* </MudChip> *@
                 </MudButton>
             }
         </MudTd>
@@ -100,7 +97,7 @@
             var addResult = ((string task, string worker, IEnumerable<string> equipments))result.Data;
             newInspectionTask.Name = addResult.task;
             newInspectionTask.WorkerId = ldb.Workers.Find(x => x.Name.Equals(addResult.worker)).First().Id;
-            var taskId = InspectionTaskCol.Insert(newInspectionTask);
+            var taskId = InspectionTaskCol?.Insert(newInspectionTask);
             foreach (var deviceName in addResult.equipments)
             {
                 var tempRecord = new InspectionTaskRecord();
@@ -156,7 +153,7 @@
         }
     }
 
-    private async void ShowTaskRecordInfo(int id)
+    private void ShowTaskRecordInfo(int id)
     {
         var record = ldb.InspectionTaskRecords.FindById(id);
         var equipment = ldb.Equipments.FindById(record.EquipmentId);

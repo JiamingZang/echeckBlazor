@@ -7,7 +7,6 @@
   </TitleContent>
   <DialogContent>
     <MudTextField @bind-Value="@newWorker.Name" Label="姓名" Variant="Variant.Text" Margin="Margin.Normal" />
-    @* <MudTextField @bind-Value="@newWorker.Sex" Label="性别" Variant="Variant.Text" Margin="Margin.Normal" /> *@
     <MudSelect @bind-Value="@newWorker.Sex" T="string" Label="性别" AnchorOrigin="Origin.BottomCenter">
       <MudSelectItem Value="@("男")" />
       <MudSelectItem Value="@("女")" />

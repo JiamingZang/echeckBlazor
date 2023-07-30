@@ -37,12 +37,6 @@
             </MudButton>
         </MudTd>
         <MudTd DataLabel="Remark">@context.Remark</MudTd>
-        @* <MudTd>
-        <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Size="Size.Small"
-        Color="Color.Info" OnClick="@((e) => UpdateInspectionTaskRecord(context.Id))">修改</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Size="Size.Small"
-        Color="Color.Error" OnClick="@((e) => DeleteInspectionTaskRecord(context.Id))">删除</MudButton>
-        </MudTd> *@
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[]{5, 10}" />

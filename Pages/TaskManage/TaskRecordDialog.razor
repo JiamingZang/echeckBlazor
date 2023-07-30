@@ -7,9 +7,6 @@
     </TitleContent>
     <DialogContent>
         <MudForm ReadOnly="true">
-
-            @* <MudTextField @bind-Value="@newInspectionTaskRecord.EquipmentId" Label="设备id" Variant="Variant.Text"
-            Margin="Margin.Normal" /> *@
             <MudTextField @bind-Value="@equipment.Name" Label="设备名称" Variant="Variant.Text" Margin="Margin.Normal" />
             <MudTextField @bind-Value="@equipment.Location" Label="设备位置" Variant="Variant.Text"
                 Margin="Margin.Normal" />
@@ -30,13 +27,8 @@
                 Margin="Margin.Normal" />
             <MudTextField @bind-Value="@newInspectionTaskRecord.Remark" Label="备注" Variant="Variant.Text"
                 Margin="Margin.Normal" />
-
         </MudForm>
     </DialogContent>
-    @* <DialogActions>
-    <MudButton OnClick="Cancel">取消</MudButton>
-    <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
-    </DialogActions> *@
 </MudDialog>
 
 @code {

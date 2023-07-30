@@ -1,0 +1,54 @@
+@using echeckBlazor.Data
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @ContentText
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm ReadOnly="true">
+
+            @* <MudTextField @bind-Value="@newInspectionTaskRecord.EquipmentId" Label="设备id" Variant="Variant.Text"
+            Margin="Margin.Normal" /> *@
+            <MudTextField @bind-Value="@equipment.Name" Label="设备名称" Variant="Variant.Text" Margin="Margin.Normal" />
+            <MudTextField @bind-Value="@equipment.Location" Label="设备位置" Variant="Variant.Text"
+                Margin="Margin.Normal" />
+            @if (newInspectionTaskRecord.Image == null)
+            {
+                <MudField Label="现场图片">
+                    暂无
+                </MudField>
+            }
+            else
+            {
+                <MudField Label="现场图片">
+                    <MudImage Width="332" Height=250 ObjectFit="ObjectFit.Cover" Src="@newInspectionTaskRecord.Image"
+                        Alt="加载失败" Elevation="25" Class="rounded-lg" />
+                </MudField>
+            }
+            <MudTextField @bind-Value="@newInspectionTaskRecord.Status" Label="子任务状态" Variant="Variant.Text"
+                Margin="Margin.Normal" />
+            <MudTextField @bind-Value="@newInspectionTaskRecord.Remark" Label="备注" Variant="Variant.Text"
+                Margin="Margin.Normal" />
+
+        </MudForm>
+    </DialogContent>
+    @* <DialogActions>
+    <MudButton OnClick="Cancel">取消</MudButton>
+    <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions> *@
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public InspectionTaskRecord newInspectionTaskRecord { get; set; } = new InspectionTaskRecord();
+    [Parameter] public Equipment equipment { get; set; } = new Equipment();
+    [Parameter] public string? ContentText { get; set; }
+
+    [Parameter] public string? ButtonText { get; set; }
+
+    [Parameter] public Color Color { get; set; }
+
+    void Submit() => MudDialog?.Close(DialogResult.Ok(newInspectionTaskRecord));
+    void Cancel() => MudDialog?.Cancel();
+}

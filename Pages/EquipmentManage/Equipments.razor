@@ -1,0 +1,196 @@
+@page "/equipments"
+@using LiteDB;
+@using echeckBlazor.Data;
+@inject LDB ldb;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@using QRCoder;
+@using Components;
+
+<MudTable Items="equipments" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
+    Filter="new Func<Equipment,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchString1" Placeholder="筛选" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Size="Size.Large"
+            Color="Color.Primary" OnClick="AddEquipment">新增</MudIconButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>id</MudTh>
+        <MudTh>设备名称</MudTh>
+        <MudTh>设备状态</MudTh>
+        <MudTh>设备位置</MudTh>
+        <MudTh>设备简介</MudTh>
+        <MudTh>图片</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Status">
+            @* @context.Status *@
+            @if (context.Status == EquipmentStatus.NORMAL)
+            {
+                <MudChip Label="true" Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Tertiary">正常</MudChip>
+            }
+            else if (context.Status == EquipmentStatus.BROKEN)
+            {
+                <MudChip Label="true" Icon="@Icons.Material.Filled.GppBad" Color="Color.Error">损坏</MudChip>
+
+            }
+            else if (context.Status == EquipmentStatus.SCRAPED)
+            {
+                <MudChip Label="true" Icon="@Icons.Material.Filled.Block" Color="Color.Dark">废弃</MudChip>
+            }
+
+        </MudTd>
+        <MudTd DataLabel="Location">@context.Location</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Img">
+            <MudButton OnClick="@((e) => ShowEquipmentImage(context.Img))">
+                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@context.Img" Alt="加载失败"
+                    Elevation="25" Class="rounded-lg" />
+            </MudButton>
+        </MudTd>
+        <MudTd>
+            <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Info" OnClick="@((e) => UpdateEquipment(context.Id))">修改</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.QrCode" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Info" OnClick="@((e) => GenerateQRCode(context.Id))">二维码</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Error" OnClick="@((e) => DeleteEquipment(context.Id))">删除</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{5, 10}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private ILiteCollection<Equipment>? EquipmentCol;
+    private Equipment newEquipment = new Equipment();
+    private List<Equipment>? equipments;
+    private string searchString1 = "";
+
+    private bool FilterFunc1(Equipment Equipment) => FilterFunc(Equipment, searchString1);
+
+    private bool FilterFunc(Equipment Equipment, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (Equipment.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (Equipment.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (Equipment.Location.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (Equipment.Status.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    protected override void OnInitialized()
+    {
+        EquipmentCol = ldb.Equipments;
+        RefreshTableData();
+    }
+
+    private void RefreshTableData()
+    {
+        equipments = EquipmentCol?.FindAll().ToList<Equipment>();
+        StateHasChanged();
+    }
+
+    private async Task AddEquipment()
+    {
+        var parameters = new DialogParameters<EquipmentDialog>();
+        parameters.Add(x => x.ContentText, "新增设备");
+        parameters.Add(x => x.ButtonText, "新增");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<EquipmentDialog>("新增设备", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            newEquipment = (Equipment)result.Data;
+            newEquipment.Status = EquipmentStatus.NORMAL;
+            if (!string.IsNullOrWhiteSpace(newEquipment.Name))
+            {
+                EquipmentCol?.Insert(newEquipment);
+                newEquipment = new Equipment();
+                RefreshTableData();
+            }
+        }
+    }
+
+    private async void UpdateEquipment(int Id)
+    {
+        var parameters = new DialogParameters<EquipmentDialog>();
+        parameters.Add(x => x.newEquipment, equipments?.Find(x => x.Id == Id));
+        parameters.Add(x => x.ContentText, "修改设备");
+        parameters.Add(x => x.ButtonText, "确认");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<EquipmentDialog>("修改设备", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            newEquipment = (Equipment)result.Data;
+            EquipmentCol?.Update(newEquipment);
+            newEquipment = new Equipment();
+        }
+        RefreshTableData();
+    }
+
+    private async Task DeleteEquipment(int Id)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "确认要删除吗");
+        parameters.Add(x => x.ButtonText, "删除");
+        parameters.Add(x => x.Color, Color.Error);
+
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("删除设备", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            EquipmentCol?.Delete(Id);
+            RefreshTableData();
+        }
+    }
+
+    private void ShowEquipmentImage(string Img)
+    {
+        var parameters = new DialogParameters<ImageDialog>();
+        parameters.Add(x => x.ImageUrl, Img);
+        parameters.Add("WidthAndHeight", (600, 450));
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        var dialog = DialogService.Show<ImageDialog>("图片", parameters, options);
+    }
+
+    private void GenerateQRCode(int Id)
+    {
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(Id.ToString(), QRCodeGenerator.ECCLevel.Q);
+        PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(20);
+        string base64str = Convert.ToBase64String(qrCodeAsPngByteArr);
+
+        var parameters = new DialogParameters<ImageDialog>();
+        parameters.Add(x => x.ImageUrl, "data:image/png;base64," + base64str);
+        parameters.Add("WidthAndHeight", (300, 300));
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        var dialog = DialogService.Show<ImageDialog>("二维码", parameters, options);
+    }
+
+}
+
+

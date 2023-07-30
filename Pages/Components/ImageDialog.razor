@@ -1,0 +1,19 @@
+<MudDialog>
+    <DialogContent>
+        <MudImage Width=@WidthAndHeight.Item1 Height=@WidthAndHeight.Item2 ObjectFit="ObjectFit.Contain" Src="@ImageUrl"
+            Alt="加载失败" Elevation="25" Class="rounded-lg" />
+    </DialogContent>
+    @* <DialogActions>
+    <MudButton OnClick="Cancel">取消</MudButton>
+    <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions> *@
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter] public string? ImageUrl { get; set; }
+
+    [Parameter] public (int, int) WidthAndHeight { get; set; }
+
+}

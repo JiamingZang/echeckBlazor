@@ -1,0 +1,36 @@
+@using echeckBlazor.Data
+<MudDialog>
+  <TitleContent>
+    <MudText Typo="Typo.h6">
+      @ContentText
+    </MudText>
+  </TitleContent>
+  <DialogContent>
+    <MudTextField @bind-Value="@newWorker.Name" Label="姓名" Variant="Variant.Text" Margin="Margin.Normal" />
+    @* <MudTextField @bind-Value="@newWorker.Sex" Label="性别" Variant="Variant.Text" Margin="Margin.Normal" /> *@
+    <MudSelect @bind-Value="@newWorker.Sex" T="string" Label="性别" AnchorOrigin="Origin.BottomCenter">
+      <MudSelectItem Value="@("男")" />
+      <MudSelectItem Value="@("女")" />
+    </MudSelect>
+    <MudTextField @bind-Value="@newWorker.Password" Label="密码" Variant="Variant.Text" Margin="Margin.Normal" />
+    <MudTextField @bind-Value="@newWorker.Email" Label="邮箱" Variant="Variant.Text" Margin="Margin.Normal" />
+  </DialogContent>
+  <DialogActions>
+    <MudButton OnClick="Cancel">取消</MudButton>
+    <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+  </DialogActions>
+</MudDialog>
+
+@code {
+  [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+  [Parameter] public Worker newWorker { get; set; } = new Worker();
+  [Parameter] public string? ContentText { get; set; }
+
+  [Parameter] public string? ButtonText { get; set; }
+
+  [Parameter] public Color Color { get; set; }
+
+  //public
+  void Submit() => MudDialog?.Close(DialogResult.Ok(newWorker));
+  void Cancel() => MudDialog?.Cancel();
+}

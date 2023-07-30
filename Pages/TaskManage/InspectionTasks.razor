@@ -1,0 +1,174 @@
+@page "/inspectionTasks"
+@using LiteDB;
+@using echeckBlazor.Data;
+@inject LDB ldb;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@using Components;
+
+<MudTable Items="inspectionTasks" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
+    Filter="new Func<InspectionTask,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchString1" Placeholder="筛选" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Size="Size.Large"
+            Color="Color.Primary" OnClick="AddInspectionTask">新增</MudIconButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>id</MudTh>
+        <MudTh>任务名称</MudTh>
+        <MudTh>工人姓名</MudTh>
+        <MudTh>状态</MudTh>
+        <MudTh>设备列表</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="WorkerName">
+            @(ldb.Workers.Find(x => x.Id == context.WorkerId).First().Name)
+        </MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="DeviceList">
+            @foreach (var record in ldb.InspectionTaskRecords.Find(x => x.TaskId == context.Id).ToList())
+            {
+
+                <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary"
+                    OnClick="@((e) => ShowTaskRecordInfo(record.Id))">
+                    @* <MudChip Color="Color.Primary"> *@
+                    @(ldb.Equipments.Find(x => x.Id == record.EquipmentId).First().Name)->@record.Status.ToString()
+                    @* </MudChip> *@
+                </MudButton>
+            }
+        </MudTd>
+        <MudTd>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Error" OnClick="@((e) => DeleteInspectionTask(context.Id))">删除</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{5, 10}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private ILiteCollection<InspectionTask>? InspectionTaskCol;
+
+    private InspectionTask newInspectionTask = new InspectionTask();
+    private List<InspectionTask>? inspectionTasks;
+    private string searchString1 = "";
+
+    private bool FilterFunc1(InspectionTask InspectionTask) => FilterFunc(InspectionTask, searchString1);
+
+    private bool FilterFunc(InspectionTask InspectionTask, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (InspectionTask.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (InspectionTask.Status.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{InspectionTask.WorkerId} {InspectionTask.Id} ".Contains(searchString))
+            return true;
+        return false;
+    }
+    protected override void OnInitialized()
+    {
+        InspectionTaskCol = ldb.InspectionTasks;
+        RefreshTableData();
+    }
+
+    private void RefreshTableData()
+    {
+        inspectionTasks = InspectionTaskCol?.FindAll().ToList<InspectionTask>();
+        StateHasChanged();
+    }
+
+    private async Task AddInspectionTask()
+    {
+        var parameters = new DialogParameters<InspectionTaskDialog>();
+        parameters.Add(x => x.ContentText, "新增任务");
+        parameters.Add(x => x.ButtonText, "新增");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<InspectionTaskDialog>("新增任务", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var addResult = ((string task, string worker, IEnumerable<string> equipments))result.Data;
+            newInspectionTask.Name = addResult.task;
+            newInspectionTask.WorkerId = ldb.Workers.Find(x => x.Name.Equals(addResult.worker)).First().Id;
+            var taskId = InspectionTaskCol.Insert(newInspectionTask);
+            foreach (var deviceName in addResult.equipments)
+            {
+                var tempRecord = new InspectionTaskRecord();
+                tempRecord.TaskId = taskId;
+                tempRecord.EquipmentId = ldb.Equipments.Find(x => x.Name.Equals(deviceName)).First().Id;
+                ldb.InspectionTaskRecords.Insert(tempRecord);
+            }
+            newInspectionTask = new InspectionTask();
+        }
+        RefreshTableData();
+    }
+
+    private async void UpdateInspectionTask(int Id)
+    {
+        var parameters = new DialogParameters<InspectionTaskDialog>();
+        parameters.Add(x => x.newInspectionTask, inspectionTasks?.Find(x => x.Id == Id));
+        parameters.Add(x => x.ContentText, "修改工人");
+        parameters.Add(x => x.ButtonText, "确认");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<InspectionTaskDialog>("修改工人", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            newInspectionTask = (InspectionTask)result.Data;
+            InspectionTaskCol?.Update(newInspectionTask);
+            newInspectionTask = new InspectionTask();
+        }
+        RefreshTableData();
+    }
+
+    private async Task DeleteInspectionTask(int Id)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "确认要删除吗");
+        parameters.Add(x => x.ButtonText, "删除");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("删除任务", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            InspectionTaskCol?.Delete(Id);
+            var records = ldb.InspectionTaskRecords.Find(x => x.TaskId == Id).ToList();
+            foreach (var record in records)
+            {
+                ldb.InspectionTaskRecords.Delete(record.Id);
+            }
+            RefreshTableData();
+        }
+    }
+
+    private async void ShowTaskRecordInfo(int id)
+    {
+        var record = ldb.InspectionTaskRecords.FindById(id);
+        var equipment = ldb.Equipments.FindById(record.EquipmentId);
+        var parameters = new DialogParameters<TaskRecordDialog>();
+        parameters.Add(x => x.newInspectionTaskRecord, record);
+        parameters.Add(x => x.ContentText, "子任务详情");
+        parameters.Add(x => x.equipment, equipment);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<TaskRecordDialog>("子任务详情", parameters, options);
+    }
+
+}
+
+

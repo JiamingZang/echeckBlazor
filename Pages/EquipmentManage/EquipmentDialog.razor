@@ -1,0 +1,32 @@
+@using echeckBlazor.Data
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @ContentText
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="@newEquipment.Name" Label="设备名称" Variant="Variant.Text" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="@newEquipment.Location" Label="设备位置" Variant="Variant.Text" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="@newEquipment.Img" Label="设备图片url" Variant="Variant.Text" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="@newEquipment.Description" Label="设备简介" Variant="Variant.Text" Margin="Margin.Normal"
+            Lines="5" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">取消</MudButton>
+        <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public Equipment newEquipment { get; set; } = new Equipment();
+    [Parameter] public string? ContentText { get; set; }
+
+    [Parameter] public string? ButtonText { get; set; }
+
+    [Parameter] public Color Color { get; set; }
+
+    void Submit() => MudDialog?.Close(DialogResult.Ok(newEquipment));
+    void Cancel() => MudDialog?.Cancel();
+}

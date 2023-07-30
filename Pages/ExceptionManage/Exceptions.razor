@@ -1,0 +1,96 @@
+@page "/exceptions"
+@using LiteDB;
+@using echeckBlazor.Data;
+@inject LDB ldb;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@using Components;
+
+<MudTable Items="inspectionTaskRecords" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
+    Filter="new Func<InspectionTaskRecord,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchString1" Placeholder="筛选" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>子任务id</MudTh>
+        <MudTh>任务名称</MudTh>
+        <MudTh>异常设备名称</MudTh>
+        <MudTh>设备位置</MudTh>
+        <MudTh>事故图片</MudTh>
+        <MudTh>备注</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        @{
+            var equipment = ldb.Equipments.FindById(context.EquipmentId);
+            var task = ldb.InspectionTasks.FindById(context.TaskId);
+            <MudTd DataLabel="Name">@task.Name</MudTd>
+            <MudTd DataLabel="EquipmentName">@equipment.Name</MudTd>
+            <MudTd DataLabel="Location">@equipment.Location</MudTd>
+        }
+        <MudTd DataLabel="Image">
+            <MudButton OnClick="@((e) => ShowImage(context.Image))">
+                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@context.Image" Alt="加载失败"
+                    Elevation="25" Class="rounded-lg" />
+            </MudButton>
+        </MudTd>
+        <MudTd DataLabel="Remark">@context.Remark</MudTd>
+        @* <MudTd>
+        <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Size="Size.Small"
+        Color="Color.Info" OnClick="@((e) => UpdateInspectionTaskRecord(context.Id))">修改</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Size="Size.Small"
+        Color="Color.Error" OnClick="@((e) => DeleteInspectionTaskRecord(context.Id))">删除</MudButton>
+        </MudTd> *@
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{5, 10}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private ILiteCollection<InspectionTaskRecord>? InspectionTaskRecordCol;
+    private InspectionTaskRecord newInspectionTaskRecord = new InspectionTaskRecord();
+    private List<InspectionTaskRecord>? inspectionTaskRecords;
+    private string searchString1 = "";
+
+    private bool FilterFunc1(InspectionTaskRecord InspectionTaskRecord) => FilterFunc(InspectionTaskRecord, searchString1);
+
+    private bool FilterFunc(InspectionTaskRecord InspectionTaskRecord, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (InspectionTaskRecord.Remark.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (InspectionTaskRecord.Status.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    protected override void OnInitialized()
+    {
+        InspectionTaskRecordCol = ldb.InspectionTaskRecords;
+        RefreshTableData();
+    }
+
+    private void RefreshTableData()
+    {
+        inspectionTaskRecords =
+        InspectionTaskRecordCol?.Find(x => x.Status == Data.TaskStatus.FAILED).ToList<InspectionTaskRecord>();
+        StateHasChanged();
+    }
+
+    private void ShowImage(string Img)
+    {
+        var parameters = new DialogParameters<ImageDialog>();
+        parameters.Add(x => x.ImageUrl, Img);
+        parameters.Add("WidthAndHeight", (600, 450));
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        var dialog = DialogService.Show<ImageDialog>("图片", parameters, options);
+    }
+
+}
+
+

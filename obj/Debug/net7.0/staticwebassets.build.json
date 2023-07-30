@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "Hash": "xdkIxOyP/epWoYSJ0uzGEVUN5/S0Eun/HUIesuDvo+A=",
+  "Source": "echeckBlazor",
+  "BasePath": "_content/echeckBlazor",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "echeckBlazor\\wwwroot",
+      "Source": "echeckBlazor",
+      "ContentRoot": "C:\\Users\\18315\\Desktop\\echeckBlazor\\wwwroot\\",
+      "BasePath": "_content/echeckBlazor",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\MudBlazor.min.css",
+      "SourceId": "MudBlazor",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\",
+      "BasePath": "_content/MudBlazor",
+      "RelativePath": "MudBlazor.min.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\MudBlazor.min.css"
+    },
+    {
+      "Identity": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\MudBlazor.min.js",
+      "SourceId": "MudBlazor",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\",
+      "BasePath": "_content/MudBlazor",
+      "RelativePath": "MudBlazor.min.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\18315\\.nuget\\packages\\mudblazor\\6.7.0\\staticwebassets\\MudBlazor.min.js"
+    },
+    {
+      "Identity": "C:\\Users\\18315\\Desktop\\echeckBlazor\\wwwroot\\favicon.ico",
+      "SourceId": "echeckBlazor",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\18315\\Desktop\\echeckBlazor\\wwwroot\\",
+      "BasePath": "_content/echeckBlazor",
+      "RelativePath": "favicon.ico",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\favicon.ico"
+    }
+  ]
+}

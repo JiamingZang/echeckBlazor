@@ -1,0 +1,70 @@
+@using echeckBlazor.Data
+@inject LDB ldb;
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @ContentText
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="@inspectionTaskName" Label="任务名称" Variant="Variant.Text" Margin="Margin.Normal" />
+        <MudSelect Margin="Margin.Normal" Dense="true" T="string" Label="工人" Variant="Variant.Text"
+        @bind-Value="selectedWorker" AnchorOrigin="Origin.BottomLeft">
+            @foreach (var worker in workers)
+            {
+                <MudSelectItem Value="@worker.Name" />
+            }
+        </MudSelect>
+        <MudSelect Margin="Margin.Normal" Dense="true" T="string" Label="设备" MultiSelection="true"
+        @bind-SelectedValues="selectedEquipments" AnchorOrigin="Origin.BottomLeft">
+            @foreach (var equipment in equipments)
+            {
+                <MudSelectItem T="string" Value="@equipment.Name" />
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">取消</MudButton>
+        <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public InspectionTask newInspectionTask { get; set; } = new InspectionTask();
+    [Parameter] public string? ContentText { get; set; }
+    [Parameter] public string? ButtonText { get; set; }
+    [Parameter] public Color Color { get; set; }
+
+    private List<Equipment>? equipments;
+    private List<Worker>? workers;
+
+    private string? inspectionTaskName;
+    private string? selectedWorker;
+    private IEnumerable<string> selectedEquipments { get; set; } = new HashSet<string>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        equipments = ldb.Equipments.FindAll().ToList<Equipment>()
+        .Where(x =>
+        ldb.InspectionTaskRecords.Find(r => r.Status != Data.TaskStatus.FINISHED & r.Status != Data.TaskStatus.FAILED).ToList()
+        .Where(r => r.EquipmentId == x.Id).ToList().Count == 0
+        ).ToList();
+        workers = ldb.Workers.FindAll().ToList<Worker>();
+    }
+
+    void Submit()
+    {
+        MudDialog?.Close(DialogResult.Ok((
+        task: inspectionTaskName,
+        worker: selectedWorker,
+        device: selectedEquipments
+        )));
+        selectedEquipments = new HashSet<string>();
+    }
+    void Cancel() => MudDialog?.Cancel();
+}
+
+
+

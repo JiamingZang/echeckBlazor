@@ -1,0 +1,146 @@
+@page "/workers"
+@using LiteDB;
+@using echeckBlazor.Data;
+@inject LDB ldb;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@using Components;
+
+<MudTable Items="workers" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
+    Filter="new Func<Worker,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchString1" Placeholder="筛选" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Size="Size.Large"
+            Color="Color.Primary" OnClick="AddWorker">新增</MudIconButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>id</MudTh>
+        <MudTh>姓名</MudTh>
+        <MudTh>性别</MudTh>
+        <MudTh>邮箱</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Sex">@context.Sex</MudTd>
+        <MudTd DataLabel="Email">
+            @context.Email
+            @* <MudButton OnClick="@(() => UpdateWorker(context.Id))">
+
+            <MudImage
+            Src="
+            https://ts1.cn.mm.bing.net/th?id=OIP-C.AtfZx4HT3t2igtiBG1MhxQHaE8&w=176&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
+            Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
+            </MudButton> *@
+
+        </MudTd>
+        <MudTd>
+            <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Info" OnClick="@((e) => UpdateWorker(context.Id))">修改</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Size="Size.Small"
+                Color="Color.Error" OnClick="@((e) => DeleteWorker(context.Id))">删除</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{5, 10}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private ILiteCollection<Worker>? workerCol;
+    private Worker newWorker = new Worker();
+    private List<Worker>? workers;
+    private string searchString1 = "";
+
+    private bool FilterFunc1(Worker worker) => FilterFunc(worker, searchString1);
+
+    private bool FilterFunc(Worker worker, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (worker.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (worker.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{worker.Sex} {worker.Id} ".Contains(searchString))
+            return true;
+        return false;
+    }
+    protected override void OnInitialized()
+    {
+        workerCol = ldb.Workers;
+        RefreshTableData();
+    }
+
+    private void RefreshTableData()
+    {
+        workers = workerCol?.FindAll().ToList<Worker>();
+        StateHasChanged();
+    }
+
+    private async Task AddWorker()
+    {
+        var parameters = new DialogParameters<WorkerDialog>();
+        parameters.Add(x => x.ContentText, "新增工人");
+        parameters.Add(x => x.ButtonText, "新增");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<WorkerDialog>("新增工人", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            newWorker = (Worker)result.Data;
+            if (!string.IsNullOrWhiteSpace(newWorker.Name))
+            {
+                workerCol?.Insert(newWorker);
+                newWorker = new Worker();
+                RefreshTableData();
+            }
+        }
+    }
+
+    private async void UpdateWorker(int Id)
+    {
+        var parameters = new DialogParameters<WorkerDialog>();
+        parameters.Add(x => x.newWorker, workers?.Find(x => x.Id == Id));
+        parameters.Add(x => x.ContentText, "修改工人");
+        parameters.Add(x => x.ButtonText, "确认");
+        parameters.Add(x => x.Color, Color.Primary);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<WorkerDialog>("修改工人", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            newWorker = (Worker)result.Data;
+            workerCol?.Update(newWorker);
+            newWorker = new Worker();
+        }
+        RefreshTableData();
+    }
+
+    private async Task DeleteWorker(int Id)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "确认要删除吗");
+        parameters.Add(x => x.ButtonText, "删除");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("删除工人", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            workerCol?.Delete(Id);
+            RefreshTableData();
+        }
+    }
+
+}
+
+

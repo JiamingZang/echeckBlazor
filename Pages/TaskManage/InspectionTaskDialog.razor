@@ -46,9 +46,9 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        equipments = ldb.Equipments.FindAll().ToList<Equipment>()
+        equipments = ldb.Equipments.FindAll()
         .Where(x =>
-        ldb.InspectionTaskRecords.Find(r => r.Status != Data.TaskStatus.FINISHED & r.Status != Data.TaskStatus.FAILED).ToList()
+        ldb.InspectionTaskRecords.Find(r => r.Status != Data.TaskStatus.FINISHED & r.Status != Data.TaskStatus.FAILED)
         .Where(r => r.EquipmentId == x.Id).ToList().Count == 0
         ).ToList();
         workers = ldb.Workers.FindAll().ToList<Worker>();

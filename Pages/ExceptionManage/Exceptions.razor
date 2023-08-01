@@ -6,6 +6,7 @@
 @inject ISnackbar Snackbar
 @using Components;
 
+<PageTitle>异常管理</PageTitle>
 <MudTable Items="inspectionTaskRecords" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
     Filter="new Func<InspectionTaskRecord,bool>(FilterFunc1)">
     <ToolBarContent>

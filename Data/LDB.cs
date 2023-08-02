@@ -1,3 +1,4 @@
+using System.Data.Common;
 using LiteDB;
 namespace echeckBlazor.Data
 {
@@ -14,9 +15,13 @@ namespace echeckBlazor.Data
 		public ILiteCollection<InspectionTaskRecord> InspectionTaskRecords
 			=> db.GetCollection<InspectionTaskRecord>("inspectionTaskRecords");
 
+		public ILiteStorage<string> ImageStorage
+			=> db.FileStorage;
+
 		public LDB()
 		{
 			db = new LiteDatabase("echeckBlazor.db");
 		}
+
 	}
 }

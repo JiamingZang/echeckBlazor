@@ -1,4 +1,5 @@
 @using echeckBlazor.Data
+@inject LDB ldb;
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -6,15 +7,43 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField @bind-Value="@newEquipment.Name" Label="设备名称" Variant="Variant.Text" Margin="Margin.Normal" />
-        <MudTextField @bind-Value="@newEquipment.Location" Label="设备位置" Variant="Variant.Text" Margin="Margin.Normal" />
-        <MudTextField @bind-Value="@newEquipment.Img" Label="设备图片url" Variant="Variant.Text" Margin="Margin.Normal" />
-        <MudTextField @bind-Value="@newEquipment.Description" Label="设备简介" Variant="Variant.Text" Margin="Margin.Normal"
-            Lines="5" />
+        <MudGrid>
+            <MudItem xs="12">
+
+                <MudTextField @bind-Value="@newEquipment.Name" Label="设备名称" Variant="Variant.Text"
+                    Margin="Margin.Normal" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="@newEquipment.Location" Label="设备位置" Variant="Variant.Text"
+                    Margin="Margin.Normal" />
+
+            </MudItem>
+            <MudItem xs="8">
+                <MudTextField @bind-Value="@newEquipment.Img" Label="设备图片url" Variant="Variant.Text"
+                    Margin="Margin.Normal" />
+
+            </MudItem>
+            <MudItem xs="4">
+                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary"
+                            StartIcon="@Icons.Material.Filled.CloudUpload" for="@context">
+                            上传
+                        </MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="@newEquipment.Description" Label="设备简介" Variant="Variant.Text"
+                    Margin="Margin.Normal" Lines="5" />
+
+            </MudItem>
+        </MudGrid>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">取消</MudButton>
-        <MudButton Color="@Color" OnClick="Submit">@ButtonText</MudButton>
+        <MudButton Color="@Color" OnClick="@((e) => Submit())">@ButtonText</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -27,6 +56,25 @@
 
     [Parameter] public Color Color { get; set; }
 
-    void Submit() => MudDialog?.Close(DialogResult.Ok(newEquipment));
+    async Task Submit()
+    {
+        if (files.Count == 1)
+        {
+            Stream imageStream = new MemoryStream();
+            await files[0].OpenReadStream(files[0].Size).CopyToAsync(imageStream);
+            imageStream.Position = 0;
+            ldb.ImageStorage.Upload(newEquipment.Name, files[0].Name, imageStream);
+        }
+        MudDialog?.Close(DialogResult.Ok(newEquipment));
+    }
     void Cancel() => MudDialog?.Cancel();
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+        files.Clear();
+        files.Add(file);
+        newEquipment.Img = file.Name;
+    }
+
 }

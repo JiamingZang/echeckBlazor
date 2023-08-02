@@ -50,7 +50,7 @@
         <MudTd DataLabel="Description">@context.Description</MudTd>
         <MudTd DataLabel="Img">
             <MudButton OnClick="@((e) => ShowEquipmentImage(context.Img))">
-                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@context.Img" Alt="加载失败"
+                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@GetImageUrl(context.Img)" Alt="加载失败"
                     Elevation="25" Class="rounded-lg" />
             </MudButton>
         </MudTd>
@@ -159,7 +159,11 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
+            var name = ldb.Equipments.FindById(Id).Name;
             EquipmentCol?.Delete(Id);
+            var imageFromLocal = ldb.ImageStorage.FindById(name);
+            if (imageFromLocal != null)
+                ldb.ImageStorage.Delete(name);
             RefreshTableData();
         }
     }
@@ -167,12 +171,29 @@
     private void ShowEquipmentImage(string Img)
     {
         var parameters = new DialogParameters<ImageDialog>();
-        parameters.Add(x => x.ImageUrl, Img);
         parameters.Add("WidthAndHeight", (600, 450));
-
+        parameters.Add(x => x.ImageUrl, GetImageUrl(Img));
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
-
         var dialog = DialogService.Show<ImageDialog>("图片", parameters, options);
+    }
+
+    private string GetImageUrl(string Img)
+    {
+        var imageFromLocal = ldb.ImageStorage.Find(x => x.Filename.Equals(Img));
+        if (imageFromLocal.Count() > 0)
+        {
+            Stream imageStream = new MemoryStream();
+            var res = ldb.ImageStorage.Download(imageFromLocal.First().Id, imageStream);
+            imageStream.Position = 0;
+            byte[] imageArr = new byte[imageStream.Length];
+            imageStream.Read(imageArr, 0, imageArr.Length);
+            string base64str = Convert.ToBase64String(imageArr);
+            return "data:image/png;base64," + base64str;
+        }
+        else
+        {
+            return Img;
+        }
     }
 
     private void GenerateQRCode(int Id)

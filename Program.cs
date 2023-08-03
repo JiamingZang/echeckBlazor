@@ -114,4 +114,17 @@ app.MapPost("/client/submit/{id}", (int id, RecordResult result) =>
 	ldb?.InspectionTasks.Update(task);
 });
 
+app.MapPost("/client/submit/{id}/img", (int id, Image img) =>
+{
+	var ldb = app.Services.GetService<LDB>();
+	Stream imageStream = new MemoryStream();
+	byte[] imageArr = Convert.FromBase64String(img.ImageString);
+	imageStream.Write(imageArr);
+	imageStream.Position = 0;
+	var record = ldb?.InspectionTaskRecords.FindById(id);
+	record.Image = "record" + record.Id;
+	ldb?.InspectionTaskRecords.Update(record);
+	ldb?.ImageStorage.Upload("record" + record.Id, "record" + record.Id, imageStream);
+});
+
 app.Run();

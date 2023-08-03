@@ -116,6 +116,7 @@ app.MapPost("/client/submit/{id}", (int id, RecordResult result) =>
 
 app.MapPost("/client/submit/{id}/img", (int id, Image img) =>
 {
+	//img:base64string
 	var ldb = app.Services.GetService<LDB>();
 	Stream imageStream = new MemoryStream();
 	byte[] imageArr = Convert.FromBase64String(img.ImageString);

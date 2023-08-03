@@ -22,6 +22,24 @@ namespace echeckBlazor.Data
 		{
 			db = new LiteDatabase("echeckBlazor.db");
 		}
+		public string GetImageSrcString(string Img)
+		{
+			var imageFromLocal = db.FileStorage.Find(x => x.Filename.Equals(Img));
+			if (imageFromLocal.Any())
+			{
+				Stream imageStream = new MemoryStream();
+				var res = db.FileStorage.Download(imageFromLocal.First().Id, imageStream);
+				imageStream.Position = 0;
+				byte[] imageArr = new byte[imageStream.Length];
+				imageStream.Read(imageArr, 0, imageArr.Length);
+				string base64str = Convert.ToBase64String(imageArr);
+				return "data:image/png;base64," + base64str;
+			}
+			else
+			{
+				return Img;
+			}
+		}
 
 	}
 }

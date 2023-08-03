@@ -32,9 +32,9 @@
             <MudTd DataLabel="Location">@equipment.Location</MudTd>
         }
         <MudTd DataLabel="Image">
-            <MudButton OnClick="@((e) => ShowImage(context.Image))">
-                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@context.Image" Alt="加载失败"
-                    Elevation="25" Class="rounded-lg" />
+            <MudButton OnClick="@((e) => ShowImage(ldb.GetImageSrcString(context.Image)))">
+                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover"
+                    Src="@ldb.GetImageSrcString(context.Image)" Alt="加载失败" Elevation="25" Class="rounded-lg" />
             </MudButton>
         </MudTd>
         <MudTd DataLabel="Remark">@context.Remark</MudTd>
@@ -74,6 +74,7 @@
         InspectionTaskRecordCol?.Find(x => x.Status == Data.TaskStatus.FAILED).ToList<InspectionTaskRecord>();
         StateHasChanged();
     }
+
 
     private void ShowImage(string Img)
     {

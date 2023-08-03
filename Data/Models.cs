@@ -62,5 +62,10 @@ namespace echeckBlazor.Data
 		public TaskStatus Status { get; set; }
 		public string? Image { get; set; }
 	}
+
+	public class Image
+	{
+		public string? ImageString { get; set; }
+	}
 	#endregion
 }

@@ -50,8 +50,8 @@
         <MudTd DataLabel="Description">@context.Description</MudTd>
         <MudTd DataLabel="Img">
             <MudButton OnClick="@((e) => ShowEquipmentImage(context.Img))">
-                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@GetImageUrl(context.Img)" Alt="加载失败"
-                    Elevation="25" Class="rounded-lg" />
+                <MudImage Width="100" Height="50" ObjectFit="ObjectFit.Cover" Src="@GetImageSrcString(context.Img)"
+                    Alt="加载失败" Elevation="25" Class="rounded-lg" />
             </MudButton>
         </MudTd>
         <MudTd>
@@ -172,12 +172,12 @@
     {
         var parameters = new DialogParameters<ImageDialog>();
         parameters.Add("WidthAndHeight", (600, 450));
-        parameters.Add(x => x.ImageUrl, GetImageUrl(Img));
+        parameters.Add(x => x.ImageUrl, GetImageSrcString(Img));
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
         var dialog = DialogService.Show<ImageDialog>("图片", parameters, options);
     }
 
-    private string GetImageUrl(string Img)
+    private string GetImageSrcString(string Img)
     {
         var imageFromLocal = ldb.ImageStorage.Find(x => x.Filename.Equals(Img));
         if (imageFromLocal.Count() > 0)

@@ -36,3 +36,7 @@ dotnet的这些东西还是挺有意思的，blazor甚至能做到直接在模�
 docker build -t echeckblazor -f .dockerfile .
 docker run -it --rm -p 8080:80 --name echeckBlazor echeckblazor
 ```
+
+### 查看litedb文件
+
+可以使用litedb studio查看(https://github.com/mbdavid/LiteDB.Studio)

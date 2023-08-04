@@ -22,13 +22,15 @@ dotnet的这些东西还是挺有意思的，blazor甚至能做到直接在模�
 
 ## 使用
 
+### 调试运行
+
 首先安装dotnet sdk，这里使用的是7.0
 
 之后在控制台进入项目目录
 
 ```dotnet watch run```
 
-docker run
+### docker运行
 
 ```cmd
 docker build -t echeckblazor -f .dockerfile .

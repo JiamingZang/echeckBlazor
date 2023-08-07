@@ -152,6 +152,12 @@
             var records = ldb.InspectionTaskRecords.Find(x => x.TaskId == Id).ToList();
             foreach (var record in records)
             {
+                if (record.Image != null)
+                {
+                    var imageFromLocal = ldb.ImageStorage.FindById(record.Image);
+                    if (imageFromLocal != null)
+                        ldb.ImageStorage.Delete(record.Image);
+                }
                 ldb.InspectionTaskRecords.Delete(record.Id);
             }
             RefreshTableData();

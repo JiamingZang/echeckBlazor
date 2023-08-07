@@ -60,7 +60,6 @@ namespace echeckBlazor.Data
 	{
 		public string? Remark { get; set; }
 		public TaskStatus Status { get; set; }
-		public string? Image { get; set; }
 	}
 
 	public class Image

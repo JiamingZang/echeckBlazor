@@ -98,8 +98,19 @@ app.MapPost("/client/submit/{id}", (int id, RecordResult result) =>
 	var record = ldb?.InspectionTaskRecords.FindById(id);
 	record.Status = result.Status;
 	record.Remark = result.Remark;
-	record.Image = result.Image;
 	ldb?.InspectionTaskRecords.Update(record);
+
+	var equipment = ldb?.Equipments.Find(x => x.Id == record.EquipmentId).FirstOrDefault();
+	if (result.Status == echeckBlazor.Data.TaskStatus.FAILED)
+	{
+		equipment.Status = EquipmentStatus.BROKEN;
+	}
+	else if (result.Status == echeckBlazor.Data.TaskStatus.FINISHED)
+	{
+		equipment.Status = EquipmentStatus.NORMAL;
+	}
+	ldb?.Equipments.Update(equipment);
+
 	var task = ldb?.InspectionTasks.FindById(record.TaskId);
 	bool TaskFinished = ldb?.InspectionTaskRecords.Find(x => x.TaskId == record.TaskId).ToList()
 		.Where(x => x.Status != echeckBlazor.Data.TaskStatus.FINISHED & x.Status != echeckBlazor.Data.TaskStatus.FAILED).ToList().Count == 0;

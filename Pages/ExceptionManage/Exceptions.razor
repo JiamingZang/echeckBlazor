@@ -10,7 +10,7 @@
 <MudBreadcrumbs Items="@(
     new List<BreadcrumbItem>{
     new BreadcrumbItem("首页", href: "#" ),
-    new BreadcrumbItem("异常管理",href: "#" )})" Separator=">"></MudBreadcrumbs>
+    new BreadcrumbItem("异常管理",href: "exceptions" )})" Separator=">"></MudBreadcrumbs>
 <MudTable Items="inspectionTaskRecords" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
     Filter="new Func<InspectionTaskRecord,bool>(FilterFunc1)">
     <ToolBarContent>

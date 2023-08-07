@@ -9,7 +9,7 @@
 <PageTitle>任务管理</PageTitle>
 <MudBreadcrumbs Items="@(
     new List<BreadcrumbItem>{
-    new BreadcrumbItem("首页", href: "#" ),
+    new BreadcrumbItem("首页", href: "/" ),
     new BreadcrumbItem("任务管理",href: "inspectionTasks" )})" Separator=">"></MudBreadcrumbs>
 <MudTable Items="inspectionTasks" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
     Filter="new Func<InspectionTask,bool>(FilterFunc1)">

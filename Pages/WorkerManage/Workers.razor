@@ -1,5 +1,4 @@
 @page "/workers"
-@page "/"
 @using LiteDB;
 @using echeckBlazor.Data;
 @inject LDB ldb;
@@ -10,8 +9,8 @@
 <PageTitle>工人管理</PageTitle>
 <MudBreadcrumbs Items="@(
     new List<BreadcrumbItem>{
-    new BreadcrumbItem("首页", href: "#" ),
-    new BreadcrumbItem("工人管理",href: "#" )})" Separator=">"></MudBreadcrumbs>
+    new BreadcrumbItem("首页", href: "/" ),
+    new BreadcrumbItem("工人管理",href: "workers" )})" Separator=">"></MudBreadcrumbs>
 <MudTable Items="workers" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
     Filter="new Func<Worker,bool>(FilterFunc1)">
     <ToolBarContent>

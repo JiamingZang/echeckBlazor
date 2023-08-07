@@ -56,13 +56,13 @@ namespace echeckBlazor.Data
 	#endregion
 
 	#region dto
-	public class RecordResult
+	public struct RecordResult
 	{
 		public string? Remark { get; set; }
 		public TaskStatus Status { get; set; }
 	}
 
-	public class Image
+	public struct Image
 	{
 		public string? ImageString { get; set; }
 	}

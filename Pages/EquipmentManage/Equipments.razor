@@ -8,6 +8,10 @@
 @using Components;
 
 <PageTitle>设备管理</PageTitle>
+<MudBreadcrumbs Items="@(
+    new List<BreadcrumbItem>{
+    new BreadcrumbItem("首页", href: "#" ),
+    new BreadcrumbItem("设备管理",href: "#" )})" Separator=">"></MudBreadcrumbs>
 <MudTable Items="equipments" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm"
     Filter="new Func<Equipment,bool>(FilterFunc1)">
     <ToolBarContent>

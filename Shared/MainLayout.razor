@@ -11,10 +11,11 @@
             OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6">易巡检 后台管理平台</MudText>
         <MudSpacer />
-        <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" />
+        <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool"
+            ThumbIcon="@(_isDarkMode ? Icons.Material.Filled.DarkMode:Icons.Material.Filled.LightMode)" />
 
 
-        @* <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Link="https://mudblazor.com/"
+        @* <MudIconButton Icon=" @Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Link="https://mudblazor.com/"
         Target="_blank" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"
         Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank" /> *@

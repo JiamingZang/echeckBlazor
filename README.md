@@ -30,6 +30,8 @@ dotnet的这些东西还是挺有意思的，blazor甚至能做到直接在模�
 
 ```dotnet watch run```
 
+api地址https://localhost:5001/swagger/index.html
+
 ### docker运行
 
 ```cmd

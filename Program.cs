@@ -139,4 +139,11 @@ app.MapPost("/client/submit/{id}/img", (int id, Image img) =>
 	ldb?.ImageStorage.Upload("record" + record.Id, "record" + record.Id, imageStream);
 });
 
+app.MapPost("/client/login", (LoginRequest request) =>
+{
+	//img:base64string
+	var ldb = app.Services.GetService<LDB>();
+	var worker = ldb.Workers.Find(x => x.Name == request.workerName&&x.Password == request.password).FirstOrDefault();
+	return worker;
+});
 app.Run();

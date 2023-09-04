@@ -66,5 +66,11 @@ namespace echeckBlazor.Data
 	{
 		public string? ImageString { get; set; }
 	}
+
+	public struct LoginRequest
+	{
+		public string workerName {get; set;}
+		public string password {get; set;}
+	}
 	#endregion
 }

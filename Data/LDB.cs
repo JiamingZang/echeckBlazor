@@ -34,6 +34,7 @@ namespace echeckBlazor.Data
 				imageStream.Read(imageArr, 0, imageArr.Length);
 				string base64str = Convert.ToBase64String(imageArr);
 				return "data:image/png;base64," + base64str;
+				
 			}
 			else
 			{

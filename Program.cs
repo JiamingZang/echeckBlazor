@@ -92,6 +92,11 @@ app.MapGet("/client/tasks/{id}", (int id) =>
 	return result;
 });
 
+app.MapGet("client/image/{imageName}",(string imageName)=>{
+	var ldb = app.Services.GetService<LDB>();
+	return ldb?.GetImageSrcString(imageName);
+});
+
 app.MapPost("/client/submit/{id}", (int id, RecordResult result) =>
 {
 	var ldb = app.Services.GetService<LDB>();
